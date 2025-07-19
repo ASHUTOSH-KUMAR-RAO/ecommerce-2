@@ -1,10 +1,11 @@
 import { Categorise } from "@/payload-types";
 import Link from "next/link";
+import { CustomCategory } from "../types";
 
 interface Props {
-  category: Categorise;
+  category: CustomCategory;
   isOpen: boolean;
-  position: { top: number; left: number };
+  position: { top: number; left: number} 
 }
 
 export const SubCategoryMenu = ({ category, isOpen, position }: Props) => {
@@ -32,11 +33,11 @@ export const SubCategoryMenu = ({ category, isOpen, position }: Props) => {
         style={{ backgroundColor }}
         className="w-50 text-black rounded-md overflow-hidden border shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-[2px] -translate-y-[2px]"
       >
-          {category.subCategorise.docs.map((subcategory: string | Categorise) => (
+          {category.subCategorise.docs.map((subcategory: string | Categorise ) => (
             <Link
               className="w-full text-left p-4 hover:bg-black hover:text-white flex justify-between items-center underline font-medium"
               key={typeof subcategory === "string" ? subcategory : subcategory.slug}
-              href={`/`}
+              href={`/${category.slug}/${subcategory.slug}`}
             >
               {typeof subcategory === "string" ? subcategory : subcategory.name}
             </Link>
