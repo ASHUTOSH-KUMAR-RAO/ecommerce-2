@@ -5,6 +5,7 @@ import { SearchFilter } from "./search-filters";
 
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
+import { CustomCategory } from "./types";
 
 interface Props {
   children: React.ReactNode;
@@ -24,20 +25,21 @@ const Layout = async ({ children }: Props) => {
         exists: false,
       },
     },
+    sort:"name"
   });
 
-  const formatedData = data.docs.map((doc) => ({
+  // Fixed formatting with proper error handling
+  const formatedData: CustomCategory[] = data.docs.map((doc) => ({
     ...doc,
-    subcategorise: (doc.subCategorise?.docs ?? []).map((doc) => ({
-      ...(doc as Categorise),
-      subCategorise:undefined
-    })),
+    // Fixed property name consistency
+    subcategorise: Array.isArray(doc.subCategorise?.docs) 
+      ? doc.subCategorise.docs.map((subDoc) => ({
+          ...(subDoc as Categorise),
+          // Remove nested subcategories to avoid infinite nesting
+          subCategorise: undefined
+        }))
+      : [], // Default to empty array instead of undefined
   }));
-
-  console.log({
-    data,
-    formatedData,
-  });
 
   return (
     <div className="flex flex-col min-h-screen">
