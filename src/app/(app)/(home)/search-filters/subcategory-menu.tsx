@@ -1,9 +1,9 @@
+import { CategoriesDetManyOutput } from "@/modules/categories/types";
 import { Categorise } from "@/payload-types";
 import Link from "next/link";
-import { CustomCategory } from "../types";
 
 interface Props {
-  category: CustomCategory;
+  category: CategoriesDetManyOutput[1];
   isOpen: boolean;
   position: { top: number; left: number} 
 }
