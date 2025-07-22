@@ -2,9 +2,8 @@ import z from "zod"
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { headers as getHeaders } from "next/headers";
 import { TRPCError } from "@trpc/server";
-import { cookies as getCookies } from "next/headers";
-import { AUTH_COOKIE } from "../constants";
 import { loginSchemas, registerSchemas } from "../schemas";
+import { generateAuthCookies } from "../utils";
 
 export const authRouter = createTRPCRouter({
     session: baseProcedure.query(async ({ ctx }) => {
@@ -34,6 +33,7 @@ export const authRouter = createTRPCRouter({
                 })
             }
             try {
+                // User create karo
                 const user = await ctx.payload.create({
                     collection: 'users',
                     data: {
@@ -43,6 +43,28 @@ export const authRouter = createTRPCRouter({
                     }
                 });
 
+                // Automatic login after registration
+                const loginData = await ctx.payload.login({
+                    collection: 'users',
+                    data: {
+                        email: input.email,
+                        password: input.password
+                    }
+                });
+
+                if (!loginData.token) {
+                    throw new TRPCError({
+                        code: "INTERNAL_SERVER_ERROR",
+                        message: "Failed to generate authentication token"
+                    })
+                }
+
+                // Cookie set karo - YE THA MISSING! 🎯
+                await generateAuthCookies({
+                    prefix: ctx.payload.config.cookiePrefix,
+                    value: loginData.token
+                })
+
                 return {
                     success: true,
                     message: "Account created successfully! ✅",
@@ -50,7 +72,8 @@ export const authRouter = createTRPCRouter({
                         id: user.id,
                         email: user.email,
                         username: user.username
-                    }
+                    },
+                    token: loginData.token // Token bhi return kar rahe hain
                 };
             } catch (error) {
                 throw new TRPCError({
@@ -62,7 +85,7 @@ export const authRouter = createTRPCRouter({
 
     login: baseProcedure
         .input(
-         loginSchemas
+            loginSchemas
         )
         .mutation(async ({ input, ctx }) => {
             try {
@@ -81,19 +104,10 @@ export const authRouter = createTRPCRouter({
                     })
                 }
 
-                const cookies = await getCookies();
-                cookies.set({
-                    name: AUTH_COOKIE,
-                    value: data.token,
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'lax',
-                    maxAge: 60 * 60 * 24 * 7, // 7 days
-                    path: "/",
-                    // Cross Domain Cookies Sharing (if needed)
-                    // sameSite: "none",
-                    // domain: ".yourdomain.com"
-                });
+                await generateAuthCookies({
+                    prefix: ctx.payload.config.cookiePrefix,
+                    value: data.token
+                })
 
                 return {
                     success: true,
@@ -108,32 +122,10 @@ export const authRouter = createTRPCRouter({
                 });
             }
         }),
-
-    logout: baseProcedure
-        .mutation(async ({ ctx }) => {
-            try {
-                const cookies = await getCookies();
-                cookies.delete(AUTH_COOKIE);
-
-                // Optional: PayloadCMS logout
-                // await ctx.payload.logout();
-
-                return {
-                    success: true,
-                    message: "Logged out successfully! 👋"
-                };
-            } catch (error) {
-                throw new TRPCError({
-                    code: "INTERNAL_SERVER_ERROR",
-                    message: "Failed to logout"
-                });
-            }
-        })
 });
 
-/* 
+/*
 Cross-domain cookie sharing KO avoid karne ke liye hum ye methods use karte hai:
-
 1. Same domain strategy - Sab kuch same domain pe rakhna
 2. JWT in headers - Cookies ki jagah headers mein token pass karna
 
@@ -148,4 +140,10 @@ PayloadCMS Benefits:
 - Built-in validation
 - Session management
 - No manual salt/hash implementation needed
+
+FIX SUMMARY:
+✅ Register ke baad automatic login
+✅ Cookie generation after registration
+✅ Token return kar rahe hain response mein
+✅ Proper error handling for token generation
 */
