@@ -7,12 +7,14 @@ import { cn } from "@/lib/utils";
 import { ListFilterIcon } from "lucide-react";
 import { CategorySidebar } from "./categories-sidebar";
 import { CategoriesDetManyOutput } from "@/modules/categories/types";
+import { useParams } from "next/navigation";
 
 interface Props {
   data: CategoriesDetManyOutput;
 }
 
 export const Categories = ({ data }: Props) => {
+  const params = useParams()
   const containerRef = useRef<HTMLDivElement>(null);
   const viewAllRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
@@ -20,7 +22,8 @@ export const Categories = ({ data }: Props) => {
   const [visibleCount, setVisibleCount] = useState(data?.length || 0);
   const [isAnyHovered, setIsAnyHovered] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const activeCategory = "all";
+  const categoryParams = params.category as string | undefined
+  const activeCategory = categoryParams || "all";
 
   const activeCategoryIndex =
     data?.findIndex((cat) => cat.slug === activeCategory) || -1;
@@ -133,8 +136,9 @@ export const Categories = ({ data }: Props) => {
         {visibleCount < data.length && (
           <div className="shrink-0 ml-2" ref={viewAllRef}>
             <Button
+            variant="elevated" 
               className={cn(
-                "h-11 px-4 rounded-full transition-all duration-200",
+                "h-11 px-4 rounded-full transition-all duration-200 ",
                 // Default subtle state - always visible but subtle
                 "bg-gray-100 text-gray-600 border border-gray-200",
                 // Hover state - more prominent
