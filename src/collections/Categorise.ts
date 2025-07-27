@@ -4,6 +4,9 @@ import type { CollectionConfig } from 'payload'
 export const Categorise: CollectionConfig = {
 
     slug: "categorise",
+    admin:{
+        useAsTitle: "name",
+    },
     fields: [
         {
             name: "name",

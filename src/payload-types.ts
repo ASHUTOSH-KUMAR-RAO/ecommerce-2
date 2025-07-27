@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     categorise: Categorise;
+    products: Product;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -83,6 +84,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categorise: CategoriseSelect<false> | CategoriseSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -183,6 +185,25 @@ export interface Categorise {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  /**
+   * Enter the price in your preferred currency e.g., 19.99 USD
+   */
+  price: number;
+  category: string | Categorise;
+  images?: (string | Media)[] | null;
+  reFundPolicy?: ('30_days' | '60_days' | '90_days' | 'no_refund') | null;
+  isFeatured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -199,6 +220,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categorise';
         value: string | Categorise;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -293,6 +318,21 @@ export interface CategoriseSelect<T extends boolean = true> {
   color?: T;
   parent?: T;
   subCategorise?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  price?: T;
+  category?: T;
+  images?: T;
+  reFundPolicy?: T;
+  isFeatured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
