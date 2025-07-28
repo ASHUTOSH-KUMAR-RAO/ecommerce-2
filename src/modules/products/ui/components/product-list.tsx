@@ -15,9 +15,14 @@ export const ProductList = ({ category }: Props) => {
     })
   );
   return (
-    <div>
-      <h1>Product List: {JSON.stringify(data, null, 2)}</h1>
-      {/* Product items will be rendered here */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
+      {data?.docs.map((product) => (
+        <div key={product.id} className="border p-4 rounded-lg">
+          <h2 className="text-lg font-semibold">{product.name}</h2>
+          <p className="text-gray-600">{product.description}</p>
+          <p className="text-xl font-bold">${product.price}</p>
+        </div>
+      ))}
     </div>
   );
 };
