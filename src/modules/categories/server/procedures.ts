@@ -29,7 +29,6 @@ export const categoriesRouter = createTRPCRouter({
                 ? doc.subCategorise.docs.map((subDoc) => ({
                     ...(subDoc as Categorise),
                     // Remove nested subcategories to avoid infinite nesting
-                    subCategorise: undefined
                 }))
                 : [], // Default to empty array instead of undefined
         }));
