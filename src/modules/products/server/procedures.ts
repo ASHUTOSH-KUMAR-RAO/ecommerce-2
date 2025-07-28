@@ -20,12 +20,14 @@ export const productsRouter = createTRPCRouter({
         // If minPrice is provided, filter products by minimum price
         if (input.minPrice) {
             where.price = {
+                ...where.price,
                 greater_than_equal: input.minPrice
             };
         }
         // If maxPrice is provided, filter products by maximum price
         if (input.maxPrice) {
             where.price = {
+                ...where.price,
                 less_than_equal: input.maxPrice
             };
         }
