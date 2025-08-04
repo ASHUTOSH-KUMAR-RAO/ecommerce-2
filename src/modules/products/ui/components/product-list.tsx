@@ -40,24 +40,28 @@ export const ProductList = ({ category }: Props) => {
     );
   }
 
+  // Fix: Remove duplicate products using unique IDs
+  const allProducts = data?.pages.flatMap((page) => page.docs) || [];
+  const uniqueProducts = allProducts.filter((product, index, array) => 
+    array.findIndex(p => p.id === product.id) === index
+  );
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
-        {data?.pages
-          .flatMap((page) => page.docs)
-          .map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              imageUrl={product.images?.url}
-              authorUsername="ashutosh kumar rao"
-              authorImageUrl={undefined}
-              reviewRating={3}
-              reviewCount={5.0}
-              price={product.price}
-            />
-          ))}
+        {uniqueProducts.map((product) => (
+          <ProductCard
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            imageUrl={product.images?.url}
+            authorUsername="ashutosh kumar rao"
+            authorImageUrl={undefined}
+            reviewRating={3}
+            reviewCount={5.0}
+            price={product.price}
+          />
+        ))}
       </div>
       <div className="flex items-center justify-center pt-8">
         {hasNextPage && (

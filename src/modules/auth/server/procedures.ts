@@ -32,6 +32,16 @@ export const authRouter = createTRPCRouter({
                     message: "This Username will be already exist",
                 })
             }
+
+            const tenants = await ctx.payload.create({
+                collection: "tenants",
+                data: {
+                    name: input.username,
+                    slug: input.username,
+                    stripeAccountId: "test",
+                }
+            })
+
             try {
                 // User create karo
                 const user = await ctx.payload.create({
@@ -39,7 +49,10 @@ export const authRouter = createTRPCRouter({
                     data: {
                         email: input.email,
                         password: input.password,
-                        username: input.username
+                        username: input.username,
+                        tenants:[{
+                            tenant:tenants.id,
+                        }]
                     }
                 });
 
