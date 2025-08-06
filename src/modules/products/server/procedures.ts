@@ -1,5 +1,5 @@
 
-import { Categorise, Media } from "@/payload-types";
+import { Categorise, Media, Tenant } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { Sort, Where } from "payload";
 import z from "zod";
@@ -19,6 +19,7 @@ export const productsRouter = createTRPCRouter({
         maxPrice: z.string().nullable().optional(),
         tags: z.array(z.string()).nullable().optional(),
         sort: z.enum(sortValues).nullable().optional(),
+        tenantSlug: z.string().nullable().optional()
     })).query(async ({ ctx, input }) => {
         const where: Where = {};
 
@@ -52,6 +53,13 @@ export const productsRouter = createTRPCRouter({
         }
 
 
+        if (input.tenantSlug) {
+            where["tenant.slug"] = {
+                equals: input.tenantSlug
+            };
+        }
+
+
         if (input.category) {
             const categoriesData = await ctx.payload.find({
                 collection: "categorise",
@@ -64,6 +72,7 @@ export const productsRouter = createTRPCRouter({
                     }
                 }
             })
+
 
             const formatedData = categoriesData.docs.map((doc) => ({
                 ...doc,
@@ -96,19 +105,21 @@ export const productsRouter = createTRPCRouter({
 
         const data = await ctx.payload.find({
             collection: "products",
-            depth: 1,
+            depth: 2,//todo=> Hamne yeha per isiliye depth 1 se 2 kiya kyuki humko isme image ka url ko bhi add krna hai ,Populate: "tenant","category","image",& "tenant.image"
             where,
             sort,
             page: input.cursor,
             limit: input.limit
         });
 
+        console.log(JSON.stringify(data.docs, null, 2))
         return {
 
             ...data,
             docs: data.docs.map((doc) => ({
                 ...doc,
-                images: doc.images as Media | null
+                images: doc.images as Media | null,
+                tenant: doc.tenant as Tenant & { image: Media | null }
             }))
         }
 

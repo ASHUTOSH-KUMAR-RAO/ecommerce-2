@@ -5,9 +5,11 @@ import { ProductSort } from "../components/product-sort";
 
 interface Props {
     category?: string;
+    tenantSlug?:string;
+    narowView?:boolean
 }
 
-export const ProductListView = ({ category }: Props) => {
+export const ProductListView = ({ category,tenantSlug,narowView }: Props) => {
   return (
     <div className="px-4 lg:px-12 py-8 flex flex-col gap-4">
         <div className="flex flex-col lg:flex-row lg:items-center gap-y-2 lg:gap-y-0 justify-between">
@@ -19,8 +21,8 @@ export const ProductListView = ({ category }: Props) => {
             <ProductFilters />
           </div>
           <div className="lg:col-span-4 xl:col-span-6">
-            <Suspense fallback={<ProductListSkeleton />}>
-              <ProductList category={category} />
+            <Suspense fallback={<ProductListSkeleton narowView ={narowView}/>}>
+              <ProductList category={category} tenantSlug={tenantSlug} narowView={narowView} />
             </Suspense>
           </div>
         </div>
