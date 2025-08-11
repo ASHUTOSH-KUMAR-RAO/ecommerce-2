@@ -8,6 +8,23 @@ import { DEFAULT_LIMIT } from "@/constants";
 
 
 export const productsRouter = createTRPCRouter({
+    getOne: baseProcedure.input(
+        z.object({
+            id: z.string()
+        })
+    ).query(async ({ ctx, input }) => {
+        const product = await ctx.payload.findByID({
+            collection: "products",
+            id: input.id,
+            depth:2
+        });
+        return {
+            ...product,
+            images: product.images as Media | null,
+            tenant:product.tenant as Tenant & {image:Media | null}
+            // images: product.images as Media | null,
+        };
+    }),
 
     getMany: baseProcedure.input(z.object({
 
