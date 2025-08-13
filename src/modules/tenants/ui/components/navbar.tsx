@@ -1,8 +1,11 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { generateTenantURL } from "@/lib/utils";
+import { CheckoutButton } from "@/modules/checkout/ui/components/checkout-button";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { ShoppingCartIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,6 +28,7 @@ export const Navbar = ({ slug }: Props) => {
         )}
         <p className="text-xl">{data.name}</p>
         </Link>
+        <CheckoutButton hideIfEmpty tenant={slug}/>
       </div>
     </nav>
   );
@@ -35,6 +39,10 @@ export const NavbarSkelton = () => {
     <nav className="h-20 border-b font-medium bg-white">
       <div className="max-w-(--breakpoint-xl) mx- flex justify-between h-full items-center px-4 lg:px-12">
         <div />
+        <Button variant='elevated' disabled className="bg-white">
+          <ShoppingCartIcon className="text-black"/>
+
+        </Button>
       </div>
     </nav>
   );
