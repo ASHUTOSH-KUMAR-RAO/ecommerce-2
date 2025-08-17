@@ -16,6 +16,7 @@ import { Categorise } from './collections/Categorise'
 import { Products } from './collections/Products'
 import { Tags } from './collections/Tag'
 import { Tenants } from './collections/Tenants'
+import { Orders } from './collections/Orders'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -27,7 +28,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categorise, Products, Tags, Tenants],
+  collections: [Users, Media, Categorise, Products, Tags, Tenants,Orders],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
