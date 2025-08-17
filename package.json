@@ -11,7 +11,12 @@
     "generate:types": "payload generate:types",
     "db:fresh": "payload migrate:fresh",
     "db:seed": "bun run src/seed.ts",
-    "db:reset": "bun run db:fresh && bun run db:seed"
+    "db:reset": "bun run db:fresh && bun run db:seed",
+    "stripe:login": "stripe login",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
+    "stripe:test": "stripe --version",
+    "stripe:events": "stripe events list",
+    "stripe:trigger": "stripe trigger payment_intent.succeeded"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -73,6 +78,7 @@
     "recharts": "2.15.4",
     "server-only": "0.0.1",
     "sonner": "^2.0.6",
+    "stripe": "18.0.0",
     "superjson": "2.2.2",
     "tailwind-merge": "^3.3.1",
     "tw-animate-css": "^1.3.5",

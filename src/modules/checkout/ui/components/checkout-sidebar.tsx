@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 
 interface Props {
   total?: number;
-  onCheckout: () => void;
+  onPurchase: () => void;
   isPending?: boolean;
   isCanceled?: boolean;
   itemCount?: number;
@@ -23,7 +23,7 @@ interface Props {
 
 const CheckoutSidebar = ({
   total = 0,
-  onCheckout,
+  onPurchase,
   isPending = false,
   isCanceled = false,
   itemCount = 0,
@@ -122,7 +122,7 @@ const CheckoutSidebar = ({
         {/* Checkout Button */}
         <div className="p-6 pt-0">
           <Button
-            onClick={onCheckout}
+            onClick={onPurchase}
             disabled={isPending || isCanceled || itemCount === 0}
             size="lg"
             className="w-full text-base font-semibold bg-black hover:bg-gray-800 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
