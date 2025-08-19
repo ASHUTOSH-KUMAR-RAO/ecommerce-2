@@ -22,7 +22,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCheckoutState } from "../../hook/use-checkout-state";
 import { useRouter } from "next/navigation";
-import { writer } from "repl";
 
 interface Props {
   tenantSlug: string;
@@ -35,7 +34,6 @@ const CheckoutViews = ({ tenantSlug }: Props) => {
     useCart(tenantSlug);
   const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const queryClient = useQueryClient();
 
   const trpc = useTRPC();

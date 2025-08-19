@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import {  useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { CartButton } from "../components/cart-button";
 
@@ -114,17 +114,6 @@ export const ProductView = ({ productId, tenantSlug }: Props) => {
       });
     }
   };
-
-  // const handleAddToCart = () => {
-  //   toast.success("🛒 Added to Cart!", {
-  //     description: `${data.name} has been added to your cart`,
-  //     action: {
-  //       label: "View Cart",
-  //       onClick: () => toast.info("Opening cart...")
-  //     },
-  //     duration: 3000
-  //   });
-  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-100">
@@ -309,6 +298,7 @@ export const ProductView = ({ productId, tenantSlug }: Props) => {
 
                     <div className="space-y-3">
                       <CartButton
+                        isPurchase={data.isPurchase}
                         productId={productId}
                         tenantSlug={tenantSlug}
                       />
@@ -341,8 +331,9 @@ export const ProductView = ({ productId, tenantSlug }: Props) => {
                   </div>
 
                   <div className="space-y-4">
+                    {/* ✅ MAIN FIX: Added unique keys for rating distribution mapping */}
                     {[5, 4, 3, 2, 1].map((stars, index) => (
-                      <div key={stars} className="group">
+                      <div key={`rating-${stars}-${index}`} className="group">
                         <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-amber-50/50 transition-colors">
                           <div className="flex items-center gap-2 min-w-[90px]">
                             <span className="font-bold text-gray-700">
@@ -384,8 +375,3 @@ export const ProductView = ({ productId, tenantSlug }: Props) => {
     </div>
   );
 };
-
-
-// todo=>  dynamic ka use Next.js mein lazy loading ke liye karte hain! Let me explain:
-
-// ! Dynamic se Solve kr sekte hai=> Jab bhi server aur client pe different data/behavior expected ho, ssr: false use karke hydration errors avoid kar sakte hain! Ye especially useful hai authentication, localStorage, geolocation wagera ke saath.
