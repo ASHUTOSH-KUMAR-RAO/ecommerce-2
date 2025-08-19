@@ -6,6 +6,8 @@ import z from "zod";
 import { sortValues } from "../searchParams";
 import { DEFAULT_LIMIT } from "@/constants";
 
+import { headers as getHeaders } from "next/headers"
+
 
 export const productsRouter = createTRPCRouter({
     getOne: baseProcedure.input(
@@ -13,15 +15,45 @@ export const productsRouter = createTRPCRouter({
             id: z.string()
         })
     ).query(async ({ ctx, input }) => {
+        const headers = await getHeaders();
+        const session = await ctx.payload.auth({ headers })
         const product = await ctx.payload.findByID({
             collection: "products",
             id: input.id,
-            depth:2
+            depth: 2
         });
+
+        let isPurchase = false
+
+        if (session.user) {
+            const orderData = await ctx.payload.find({
+                collection: "orders",
+                pagination: false,
+                limit: 1,
+                where: {
+                    and: [
+                        {
+                            product: {
+                                equals: input.id
+                            }
+                        },
+                        {
+                            user: {
+                                equals: session.user.id
+                            }
+                        }
+                    ]
+                }
+            })
+            isPurchase = !!orderData.docs[0]
+            //! Pehla ! (NOT operator) - truthy/falsy ko opposite boolean banata hai
+            //todo=> Doosra ! - usse wapas opposite kar deta hai, final boolean mil jata hai
+        }
         return {
             ...product,
+            isPurchase,
             images: product.images as Media | null,
-            tenant:product.tenant as Tenant & {image:Media | null}
+            tenant: product.tenant as Tenant & { image: Media | null }
             // images: product.images as Media | null,
         };
     }),
@@ -129,7 +161,6 @@ export const productsRouter = createTRPCRouter({
             limit: input.limit
         });
 
-        console.log(JSON.stringify(data.docs, null, 2))
         return {
 
             ...data,

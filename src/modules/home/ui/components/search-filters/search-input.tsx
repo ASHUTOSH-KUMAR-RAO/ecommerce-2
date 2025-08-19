@@ -41,7 +41,7 @@ export const SearchInput = ({ disabled }: Props) => {
           variant="elevated"
           className="border-none bg-[#f5f5f4]"
           >
-              <Link href="/library">
+              <Link prefetch href="/library">
                 <BookmarkCheckIcon />
                 Library
               </Link>
