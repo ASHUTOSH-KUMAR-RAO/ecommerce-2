@@ -76,9 +76,35 @@ export const libraryRouter = createTRPCRouter({
           },
         },
       });
+       const dataWithSummarizedReviews = await Promise.all(
+         // yedi hum kabhi bhi promises ke andar Promise.all use karenge then isese hum map ke andar async ko bhi use kr sekte hai aur ye js ka concepts hai
+         productsData.docs.map(async (doc) => {
+           const reviewsData = await ctx.payload.find({
+             collection: "reviews",
+             pagination: false,
+             where: {
+               product: {
+                 equals: doc.id,
+               },
+             },
+           });
+
+           return {
+             ...doc,
+             reviewCount: reviewsData.totalDocs,
+             reviewsRating:
+               reviewsData.docs.length === 0
+                 ? 0
+                 : reviewsData.docs.reduce(
+                     (acc, review) => acc + review.rating,
+                     0
+                   ) / reviewsData.totalDocs,
+           };
+         })
+       );
       return {
         ...productsData,
-        docs: productsData.docs.map((doc) => ({
+        docs: dataWithSummarizedReviews.map((doc) => ({
           ...doc,
           images: doc.images as Media | null,
           tenant: doc.tenant as Tenant & { image: Media | null },
