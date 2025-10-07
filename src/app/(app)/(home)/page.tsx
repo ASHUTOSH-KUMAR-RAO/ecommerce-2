@@ -15,7 +15,7 @@ const page = async ({  searchParams }: Props) => {
 
   const filters = await LoadProductsFilter(searchParams);
 
-  console.log(JSON.stringify(filters), "THIS IS FROM RSC");
+  // console.log(JSON.stringify(filters), "THIS IS FROM RSC");
 
   const queryClient = getQueryClient();
   void queryClient.prefetchInfiniteQuery(
