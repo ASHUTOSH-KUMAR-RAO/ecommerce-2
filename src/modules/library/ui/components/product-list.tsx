@@ -15,7 +15,7 @@ export const ProductList = () => {
     useSuspenseInfiniteQuery(
       trpc.library.getMany.infiniteQueryOptions(
         {
-         
+
           limit: DEFAULT_LIMIT,
         },
         {
@@ -54,8 +54,8 @@ export const ProductList = () => {
             imageUrl={product.images?.url}
             tenantSlug={product.tenant?.slug}
             tenantImageUrl={product.tenant?.image?.url}
-            reviewRating={3}
-            reviewCount={5.0}
+            reviewRating={product.reviewsRating}
+            reviewCount={product.reviewCount}
           />
         ))}
       </div>
