@@ -7,7 +7,7 @@ import Link from "next/link";
 interface Props {
   tenantSlug: string;
   productId: string;
-  isPurchase: boolean;
+  isPurchase?: boolean;
 }
 
 export const CartButton = ({ tenantSlug, productId, isPurchase }: Props) => {

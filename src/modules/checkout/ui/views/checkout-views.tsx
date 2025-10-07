@@ -76,10 +76,10 @@ const CheckoutViews = ({ tenantSlug }: Props) => {
     if (state.success) {
       setStates({success:false,cancel:false})
       clearCart();
-
-      router.push("/products");
+      queryClient.invalidateQueries(trpc.library.getMany.infiniteQueryFilter())
+      router.push("/library");
     }
-  }, [state.success, clearCart, router,setStates]);
+  }, [state.success, clearCart, router,setStates,queryClient,trpc.library.getMany]);
 
   useEffect(() => {
     if (error?.data?.code === "NOT_FOUND") {

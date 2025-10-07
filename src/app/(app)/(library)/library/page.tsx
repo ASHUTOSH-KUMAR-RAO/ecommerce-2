@@ -10,10 +10,11 @@ const page = () => {
       limit: DEFAULT_LIMIT,
     })
   );
-  return;
-  <HydrationBoundary state={dehydrate(queryClient)}>
+  return(
+    <HydrationBoundary state={dehydrate(queryClient)}>
     <LibraryView />
-  </HydrationBoundary>;
+  </HydrationBoundary>
+  )
 };
 
 export default page;
