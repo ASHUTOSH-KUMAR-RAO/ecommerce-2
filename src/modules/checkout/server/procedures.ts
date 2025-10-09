@@ -9,13 +9,13 @@ import { stripe } from "@/lib/stripe";
 export const checkoutRouter = createTRPCRouter({
 
     purchase: protectedProcedure
-        .input(z.object({ 
+        .input(z.object({
             productIds: z.array(z.string()).min(1),  // ✅ Fixed: "productsIds" → "productIds"
-            tenantSlug: z.string().min(1) 
+            tenantSlug: z.string().min(1)
         }))
         .mutation(async ({ ctx, input }) => {
             console.log("🔍 Purchase procedure started with:", input);
-            
+
             const products = await ctx.payload.find({
                 collection: "products",
                 depth: 2,
@@ -65,7 +65,7 @@ export const checkoutRouter = createTRPCRouter({
             const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = products.docs.map((product) => ({
                 quantity: 1,
                 price_data: {
-                    unit_amount: product.price * 100,  // Stripe price ko cents ke form mein handle karta hai 
+                    unit_amount: product.price * 100,  // Stripe price ko cents ke form mein handle karta hai
                     currency: "usd",
                     product_data: {
                         name: product.name,
@@ -87,7 +87,7 @@ export const checkoutRouter = createTRPCRouter({
                 cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?cancel=true`,
                 mode: "payment",
                 line_items: lineItems,
-                invoice_creation: { //! jaise hum payment krte hai n uske baad invoice create just wahi same things hum kaar rehe hai ,menas real world experience 
+                invoice_creation: { //! jaise hum payment krte hai n uske baad invoice create just wahi same things hum kaar rehe hai ,menas real world experience
                     enabled: true
                 },
                 metadata: {
