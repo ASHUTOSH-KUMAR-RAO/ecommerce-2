@@ -1,26 +1,38 @@
-import type { CollectionConfig } from 'payload'
-import {tenantsArrayField} from "@payloadcms/plugin-multi-tenant/fields"
+import type { CollectionConfig } from "payload";
+import { tenantsArrayField } from "@payloadcms/plugin-multi-tenant/fields";
+import { isSuperAdmin } from "@/lib/access";
 
 const defaultTenantsArrayField = tenantsArrayField({
-  tenantsArrayFieldName:"tenants",
-  tenantsCollectionSlug:"tenants",
-  tenantsArrayTenantFieldName:"tenant",
-  arrayFieldAccess:{
+  tenantsArrayFieldName: "tenants",
+  tenantsCollectionSlug: "tenants",
+  tenantsArrayTenantFieldName: "tenant",
+  arrayFieldAccess: {
     read: () => true,
-    create: () => true,
-    update: () => true,
+    create: ({ req }) => isSuperAdmin(req.user),
+    update: ({ req }) => isSuperAdmin(req.user),
   },
-  tenantFieldAccess:{
+  tenantFieldAccess: {
     read: () => true,
-    create: () => true,
-    update: () => true,
-  }
-})
+    create: ({ req }) => isSuperAdmin(req.user),
+    update: ({ req }) => isSuperAdmin(req.user),
+  },
+});
 
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: "users",
+  access: {
+    read: () => true,
+    create: ({ req }) => isSuperAdmin(req.user),
+    delete: ({ req }) => isSuperAdmin(req.user),
+    update: ({ req, id }) => {
+      if (isSuperAdmin(req.user)) return true;
+
+      return req?.user?.id === id;
+    },
+  },
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: "email",
+    hidden:({user})=>!isSuperAdmin(user)
   },
   auth: true,
   fields: [
@@ -32,22 +44,24 @@ export const Users: CollectionConfig = {
     },
 
     {
-      admin:{
-        position: 'sidebar',
+      admin: {
+        position: "sidebar",
       },
-      name:"roles",
-      type:"select",
-      defaultValue:["user"],
-      hasMany:true,
-      options:["super-admin","user"]
+      name: "roles",
+      type: "select",
+      defaultValue: ["user"],
+      hasMany: true,
+      options: ["super-admin", "user"],
+      access:{
+        update:({req})=>isSuperAdmin(req.user)
+      }
     },
     {
       ...defaultTenantsArrayField,
-      admin:{
+      admin: {
         ...(defaultTenantsArrayField?.admin || {}),
-        position: 'sidebar',
-      }
-    }
-
+        position: "sidebar",
+      },
+    },
   ],
-}
+};

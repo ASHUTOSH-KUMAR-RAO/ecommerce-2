@@ -20,7 +20,10 @@ export const productsRouter = createTRPCRouter({
       const product = await ctx.payload.findByID({
         collection: "products",
         id: input.id,
-        depth: 2,
+        depth:2,
+        select: {
+          content: false,
+        },
       });
 
       let isPurchase = false;
@@ -208,6 +211,9 @@ export const productsRouter = createTRPCRouter({
         sort,
         page: input.cursor,
         limit: input.limit,
+        select:{
+            content:false
+        }
       });
 
       const dataWithSummarizedReviews = await Promise.all(
