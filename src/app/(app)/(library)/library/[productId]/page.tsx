@@ -7,6 +7,7 @@ import {
   HydrationBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { Suspense } from "react";
 
 interface Props {
   params: Promise<{
@@ -28,7 +29,9 @@ const page = async ({ params }: Props) => {
   );
   return;
   <HydrationBoundary state={dehydrate(queryClient)}>
-    <ProductView productId={productId} />
+    <Suspense fallback={<p>Loading..</p>}>
+      <ProductView productId={productId} />
+    </Suspense>
   </HydrationBoundary>;
 };
 

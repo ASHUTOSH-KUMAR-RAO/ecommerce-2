@@ -74,6 +74,11 @@ export const checkoutRouter = createTRPCRouter({
                 equals: input.tenantSlug,
               },
             },
+            {
+              isArchived: {
+                not_equals: true,
+              },
+            },
           ],
         },
       });
@@ -140,25 +145,28 @@ export const checkoutRouter = createTRPCRouter({
 
       const platformFeeAmount = Math.round(totalAmount * (10 / 100));
 
-      const checkout = await stripe.checkout.sessions.create({
-        customer_email: ctx.session.user.email,
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?success=true`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?cancel=true`,
-        mode: "payment",
-        line_items: lineItems,
-        invoice_creation: {
-          //! jaise hum payment krte hai n uske baad invoice create just wahi same things hum kaar rehe hai ,menas real world experience
-          enabled: true,
+      const checkout = await stripe.checkout.sessions.create(
+        {
+          customer_email: ctx.session.user.email,
+          success_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?success=true`,
+          cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?cancel=true`,
+          mode: "payment",
+          line_items: lineItems,
+          invoice_creation: {
+            //! jaise hum payment krte hai n uske baad invoice create just wahi same things hum kaar rehe hai ,menas real world experience
+            enabled: true,
+          },
+          metadata: {
+            userId: ctx.session.user.id,
+          } as CheckoutMetadata,
+          payment_intent_data: {
+            application_fee_amount: platformFeeAmount,
+          },
         },
-        metadata: {
-          userId: ctx.session.user.id,
-        } as CheckoutMetadata,
-        payment_intent_data: {
-          application_fee_amount: platformFeeAmount,
-        },
-      },{
-        stripeAccount:tenant.stripeAccountId
-      });
+        {
+          stripeAccount: tenant.stripeAccountId,
+        }
+      );
 
       if (!checkout.url) {
         console.log("❌ Failed to create checkout session");
@@ -183,9 +191,19 @@ export const checkoutRouter = createTRPCRouter({
         collection: "products",
         depth: 2, //todo=> Hamne yeha per isiliye depth 1 se 2 kiya kyuki humko isme image ka url ko bhi add krna hai ,Populate: "tenant","category","image",& "tenant.image",
         where: {
-          id: {
-            in: input.ids,
-          },
+          and: [
+            {
+              id: {
+                in: input.ids,
+              },
+            },
+
+            {
+              isArchived:{
+                not_equals:true
+              }
+            }
+          ],
         },
       });
 

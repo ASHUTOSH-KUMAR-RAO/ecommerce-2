@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import ReviewSidebar from "../components/review-sidebar";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+import { Suspense } from "react";
 
 interface Props {
   productId: string;
@@ -34,12 +36,15 @@ const ProductView = ({ productId }: Props) => {
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 lg:gap-14">
           <div className="lg:col-span-2">
             <div className="p-4 bg-white rounded-md border gap-4">
+              <Suspense fallback={<p>Loading.....</p>}>
+
               <ReviewSidebar productId={productId} />
+              </Suspense>
             </div>
           </div>
           <div className="lg:col-span-5">
             {data.content ? (
-              <p>{data.content}</p>
+             <RichText data={data.content}/>
             ) : (
               <p className="font-medium italic text-muted-foreground">
                 No Special Content

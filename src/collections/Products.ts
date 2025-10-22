@@ -1,19 +1,18 @@
 import { isSuperAdmin } from "@/lib/access";
-import { Tenant } from "@/payload-types";
+import { lexicalEditor, UploadFeature } from "@payloadcms/richtext-lexical";
+// import { Tenant } from "@/payload-types";
 import { CollectionConfig } from "payload";
 
 export const Products: CollectionConfig = {
   slug: "products",
   access: {
-    create: ({ req }) => {
-      if (isSuperAdmin(req.user)) return true;
-      const tenant = req.user?.tenants?.[0]?.tenant as Tenant;
-      return Boolean(tenant?.stripeDetailsSubmitted);
-    },
+    read: () => true,
+    create: () => true,
+    delete: ({ req }) => isSuperAdmin(req.user),
   },
   admin: {
     useAsTitle: "name",
-    description:"You must verify your account before creating a products "
+    description: "You must verify your account before creating a products ",
   },
   fields: [
     {
@@ -23,7 +22,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: "description",
-      type: "text",
+      type: "richText",
       required: true,
     },
     {
@@ -86,10 +85,46 @@ export const Products: CollectionConfig = {
     },
     {
       name: "content",
-      type: "textarea",
+      type: "richText",
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          UploadFeature({
+            collections: {
+              media: {
+                fields: [
+                  {
+                    name: "name",
+                    type: "text",
+                  },
+                ],
+              },
+            },
+          }),
+        ],
+      }),
       admin: {
         description:
           "Protected content only visible to customer after purchase.Add Product documentation,downloadable files,getting started guides,and bonus material.",
+      },
+    },
+
+    {
+      name: "isPrivate",
+      label: "Private",
+      defaultValue: false,
+      type: "checkbox",
+      admin: {
+        description: "Check this Product will be not shown on the storeFront",
+      },
+    },
+    {
+      name: "isArchived",
+      label: "Archive",
+      defaultValue: false,
+      type: "checkbox",
+      admin: {
+        description: "Check If you want to hide or delete the product",
       },
     },
   ],
