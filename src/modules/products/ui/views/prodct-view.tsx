@@ -19,6 +19,7 @@ import {
   CopyIcon,
   CheckIcon,
 } from "lucide-react";
+import {RichText} from "@payloadcms/richtext-lexical/react"
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -191,7 +192,7 @@ export const ProductView = ({ productId, tenantSlug }: Props) => {
                     </h3>
                     <div className="bg-gray-50 rounded-lg p-6">
                       <p className="text-gray-700 leading-relaxed">
-                        {data.description}
+                      <RichText data = {data.description}/>
                       </p>
                     </div>
                   </div>
